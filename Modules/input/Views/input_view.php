@@ -106,13 +106,15 @@ input[type="checkbox"] { margin:0px; }
 }
 
 [data-col="B"] { width:40px; }
-[data-col="A"] { width:200px; }
-[data-col="G"] { width:200px; }
 [data-col="F"] { width:50px; }
-[data-col="E"] { width:100px; }
-[data-col="D"] { width:100px; }
 [data-col="C"] { width:50px; }
 
+/*
+[data-col="A"] { width:200px; }
+[data-col="G"] { width:200px; }
+[data-col="E"] { width:100px; }
+[data-col="D"] { width:100px; }
+*/
 </style>
 
 <div>
@@ -151,13 +153,13 @@ input[type="checkbox"] { margin:0px; }
       <div id="collapse1" class="node-inputs collapse tbody in" data-node="0">
         <div class="node-input status-danger" id="{{ input.id }}" v-for="(input,index) in node">  
           <div class="select text-center" data-col="B"><input class="input-select" type="checkbox" id="{{ input.id }}"  /></div>
-          <div class="name" data-col="A">{{ input.name }}</div>
-          <div class="description" data-col="G">{{ input.description }}</div>
-          <div class="processlist" data-col="H"><div class="label-container line-height-normal"></div></div>
+          <div class="name" data-col="A" :style="{width:name_width+'px'}" >{{ input.name }}</div>
+          <div class="description" data-col="G" :style="{width:description_width+'px'}">{{ input.description }}</div>
+          <div class="processlist" data-col="H"><div class="label-container line-height-normal" v-html=input.processlistHtml></div></div>
           <div class="buttons pull-right">
             <div class="schedule text-center hidden" data-col="F"></div>
-            <div class="time text-center" data-col="E" v-html="list_format_updated(input.time)"></div>
-            <div class="value text-center" data-col="D" v-html="list_format_value(input.value)"></div>
+            <div class="time text-center" data-col="E" :style="{width:time_width+'px', color:input.time_color}">{{ input.time_value }}</div>
+            <div class="value text-center" data-col="D" :style="{width:value_width+'px'}">{{ input.value_str }}</div>
             <div class="configure text-center cursor-pointer" data-col="C" id="{{ input.id }}"><i class="icon-wrench" title="Configure Input processing"></i></div>
           </div>
         </div>
@@ -279,15 +281,11 @@ updaterStart(update, 5000);
 var app = new Vue({
   el: '#app',
   data: {
-    nodes: []
-  },
-  methods: {
-      list_format_updated:function(value) {
-          return list_format_updated(value);
-      },
-      list_format_value:function(value) {
-          return list_format_value(value);
-      }
+    nodes: [],
+    name_width: "200px",
+    description_width: "200px",
+    time_width: "100px",
+    value_width: "100px"
   }
 });
 // ---------------------------------------------------------------------------------------------
@@ -307,16 +305,40 @@ function update(){
         $.ajax({ url: path+"input/list.json", dataType: 'json', async: true, success: function(data, textStatus, xhr) {
             table.timeServerLocalOffset = requestTime-(new Date(xhr.getResponseHeader('Date'))).getTime(); // Offset in ms from local to server time
             
+            max_name_length = 0
+            max_description_length = 0
+            max_time_length = 0
+            max_value_length = 0
             
             nodes = {}
             for (var z in data) {
-                if (nodes[data[z].nodeid]==undefined) nodes[data[z].nodeid] = []
-                nodes[data[z].nodeid].push(data[z]);
+                var input = data[z];
+                if (nodes[input.nodeid]==undefined) nodes[input.nodeid] = []
+                
+                var processlistHtml = processlist_ui ? processlist_ui.drawpreview(input.processList, input) : '';
+                input.processlistHtml = processlistHtml;
+                
+                var fv = list_format_updated_obj(input.time);
+                input.time_color = fv.color
+                input.time_value = fv.value
+                
+                var value_str = list_format_value(input.value);
+                input.value_str = value_str
+            
+                nodes[data[z].nodeid].push(input);
+                
+                if (input.name.length>max_name_length) max_name_length = input.name.length;
+                if (input.description.length>max_description_length) max_description_length = input.description.length;
+                if (String(fv.value).length>max_time_length) max_time_length = String(fv.value).length;
+                if (String(value_str).length>max_value_length) max_value_length = String(value_str).length;  
+                
             }
+            app.name_width = ((max_name_length*8)+20);
+            app.description_width = ((max_description_length*8)+20);
+            app.time_width = ((max_time_length*8)+20);
+            app.value_width = ((max_value_length*8)+20);
             
             app.nodes = nodes
-            
-            
               
             // Associative array of inputs by id
             inputs = {};
@@ -355,6 +377,7 @@ function update(){
                 firstLoad = false;
             }
             // draw_devices();
+            // onResize();
             noProcessNotification(devices);
         }});
     }});
