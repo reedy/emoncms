@@ -6,6 +6,7 @@
 <script src="<?php echo $path; ?>Modules/input/Views/input.js"></script>
 <script src="<?php echo $path; ?>Modules/feed/feed.js"></script>
 <script src="<?php echo $path; ?>Lib/responsive-linked-tables.js"></script>
+<script src="<?php echo $path; ?>Lib/vue.min.js"></script>
 
 <style>
 
@@ -133,6 +134,37 @@ input[type="checkbox"] { margin:0px; }
     </div>
     
     <div id="noprocesses"></div>
+    
+    <div id="app">
+    <div class="node accordion line-height-expanded" v-for="(node,index) in nodes">   
+      <div class="node-info accordion-toggle thead status-danger" data-node="0" data-toggle="collapse" data-target="#collapse1">     
+        <div class="select text-center has-indicator" data-col="B"><span class="icon-chevron-down icon-indicator"><span></div>     
+        <h5 class="name" data-col="A">{{ index }}</h5><span class="description" data-col="G"></span>
+        <div class="processlist" data-col="H" data-col-width="auto"></div>    
+        <div class="buttons pull-right">
+          <div class="device-schedule text-center hidden" data-col="F" data-col-width="50"><i class="icon-time"></i></div>
+          <div class="device-last-updated text-center" data-col="E"></div>
+          <a href="#" class="device-key text-center" data-col="D" data-toggle="tooltip" data-tooltip-title="Show node key" data-device-key="No device key created" data-col-width="50"><i class="icon-lock"></i></a>
+          <div class="device-configure text-center" data-col="C" data-col-width="50"><i class="icon-cog" title="Configure device using device template"></i></div>
+        </div>
+      </div>
+      <div id="collapse1" class="node-inputs collapse tbody in" data-node="0">
+        <div class="node-input status-danger" id="{{ input.id }}" v-for="(input,index) in node">  
+          <div class="select text-center" data-col="B"><input class="input-select" type="checkbox" id="{{ input.id }}"  /></div>
+          <div class="name" data-col="A">{{ input.name }}</div>
+          <div class="description" data-col="G">{{ input.description }}</div>
+          <div class="processlist" data-col="H"><div class="label-container line-height-normal"></div></div>
+          <div class="buttons pull-right">
+            <div class="schedule text-center hidden" data-col="F"></div>
+            <div class="time text-center" data-col="E" v-html="list_format_updated(input.time)"></div>
+            <div class="value text-center" data-col="D" v-html="list_format_value(input.value)"></div>
+            <div class="configure text-center cursor-pointer" data-col="C" id="{{ input.id }}"><i class="icon-wrench" title="Configure Input processing"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    
     <div id="table" class="input-list"></div>
     
     <div id="output"></div>
@@ -243,6 +275,21 @@ function updaterStart(func, interval){
 }
 updaterStart(update, 5000);
 
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    nodes: []
+  },
+  methods: {
+      list_format_updated:function(value) {
+          return list_format_updated(value);
+      },
+      list_format_value:function(value) {
+          return list_format_value(value);
+      }
+  }
+});
 // ---------------------------------------------------------------------------------------------
 // Fetch device and input lists
 // ---------------------------------------------------------------------------------------------
@@ -259,6 +306,17 @@ function update(){
         var requestTime = (new Date()).getTime();
         $.ajax({ url: path+"input/list.json", dataType: 'json', async: true, success: function(data, textStatus, xhr) {
             table.timeServerLocalOffset = requestTime-(new Date(xhr.getResponseHeader('Date'))).getTime(); // Offset in ms from local to server time
+            
+            
+            nodes = {}
+            for (var z in data) {
+                if (nodes[data[z].nodeid]==undefined) nodes[data[z].nodeid] = []
+                nodes[data[z].nodeid].push(data[z]);
+            }
+            
+            app.nodes = nodes
+            
+            
               
             // Associative array of inputs by id
             inputs = {};
@@ -296,7 +354,7 @@ function update(){
                 $('#input-loader').hide();
                 firstLoad = false;
             }
-            draw_devices();
+            // draw_devices();
             noProcessNotification(devices);
         }});
     }});
