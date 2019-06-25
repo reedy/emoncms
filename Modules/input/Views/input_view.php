@@ -105,16 +105,18 @@ input[type="checkbox"] { margin:0px; }
     color: #C70!important;
 }
 
-[data-col="B"] { width:40px; }
-[data-col="F"] { width:50px; }
-[data-col="C"] { width:50px; }
+[data-col="B"] { width:40px; overflow:hidden; }
+[data-col="F"] { width:50px; overflow:hidden; }
+[data-col="C"] { width:50px; overflow:hidden; }
 
-/*
-[data-col="A"] { width:200px; }
-[data-col="G"] { width:200px; }
-[data-col="E"] { width:100px; }
-[data-col="D"] { width:100px; }
-*/
+
+[data-col="A"] { overflow:hidden; }
+[data-col="G"] { overflow:hidden; }
+[data-col="E"] { overflow:hidden; }
+[data-col="D"] { overflow:hidden; }
+
+
+[data-col="H"] { overflow:hidden; }
 </style>
 
 <div>
@@ -138,33 +140,34 @@ input[type="checkbox"] { margin:0px; }
     <div id="noprocesses"></div>
     
     <div id="app">
-    <div class="node accordion line-height-expanded" v-for="(node,index) in nodes">   
-      <div class="node-info accordion-toggle thead status-danger" data-node="0" data-toggle="collapse" data-target="#collapse1">     
-        <div class="select text-center has-indicator" data-col="B"><span class="icon-chevron-down icon-indicator"><span></div>     
-        <h5 class="name" data-col="A">{{ index }}</h5><span class="description" data-col="G"></span>
-        <div class="processlist" data-col="H" data-col-width="auto"></div>    
-        <div class="buttons pull-right">
-          <div class="device-schedule text-center hidden" data-col="F" data-col-width="50"><i class="icon-time"></i></div>
-          <div class="device-last-updated text-center" data-col="E"></div>
-          <a href="#" class="device-key text-center" data-col="D" data-toggle="tooltip" data-tooltip-title="Show node key" data-device-key="No device key created" data-col-width="50"><i class="icon-lock"></i></a>
-          <div class="device-configure text-center" data-col="C" data-col-width="50"><i class="icon-cog" title="Configure device using device template"></i></div>
-        </div>
-      </div>
-      <div id="collapse1" class="node-inputs collapse tbody in" data-node="0">
-        <div class="node-input status-danger" id="{{ input.id }}" v-for="(input,index) in node">  
-          <div class="select text-center" data-col="B"><input class="input-select" type="checkbox" id="{{ input.id }}"  /></div>
-          <div class="name" data-col="A" :style="{width:name_width+'px'}" >{{ input.name }}</div>
-          <div class="description" data-col="G" :style="{width:description_width+'px'}">{{ input.description }}</div>
-          <div class="processlist" data-col="H"><div class="label-container line-height-normal" v-html=input.processlistHtml></div></div>
+      <div class="node accordion line-height-expanded" v-for="(node,index) in nodes">   
+        <div class="node-info accordion-toggle thead status-danger" data-node="0" data-toggle="collapse" data-target="#collapse1">     
+          <div class="select text-center has-indicator" data-col="B"><span class="icon-chevron-down icon-indicator"><span></div>     
+          <h5 class="name" data-col="A" :style="{width:col.A+'px'}">{{ index }}</h5>
+          <span class="description" data-col="G" :style="{width:col.G+'px'}"></span>
+          <div class="processlist" data-col="H" :style="{width:col.H+'px'}"></div>    
           <div class="buttons pull-right">
-            <div class="schedule text-center hidden" data-col="F"></div>
-            <div class="time text-center" data-col="E" :style="{width:time_width+'px', color:input.time_color}">{{ input.time_value }}</div>
-            <div class="value text-center" data-col="D" :style="{width:value_width+'px'}">{{ input.value_str }}</div>
-            <div class="configure text-center cursor-pointer" data-col="C" id="{{ input.id }}"><i class="icon-wrench" title="Configure Input processing"></i></div>
+            <div class="device-schedule text-center hidden" data-col="F" :style="{width:col.F+'px'}"><i class="icon-time"></i></div>
+            <div class="device-last-updated text-center" data-col="E" :style="{width:col.E+'px'}"></div>
+            <a href="#" class="device-key text-center" data-col="D" :style="{width:col.D+'px'}" data-toggle="tooltip" data-tooltip-title="Show node key" data-device-key="No device key created" data-col-width="50"><i class="icon-lock"></i></a>
+            <div class="device-configure text-center" data-col="C" :style="{width:col.C+'px'}"><i class="icon-cog" title="Configure device using device template"></i></div>
+          </div>
+        </div>
+        <div id="collapse1" class="node-inputs collapse tbody in" data-node="0">
+          <div class="node-input status-danger" id="{{ input.id }}" v-for="(input,index) in node">  
+            <div class="select text-center" data-col="B"><input class="input-select" type="checkbox" id="{{ input.id }}"  /></div>
+            <div class="name" data-col="A" :style="{width:col.A+'px'}" >{{ input.name }}</div>
+            <div class="description" data-col="G" :style="{width:col.G+'px'}">{{ input.description }}</div>
+            <div class="processlist" data-col="H" :style="{width:col.H+'px'}"><div class="label-container line-height-normal" v-html=input.processlistHtml></div></div>
+            <div class="buttons pull-right">
+              <div class="schedule text-center hidden" data-col="F" :style="{width:col.F+'px'}"></div>
+              <div class="time text-center" data-col="E" :style="{width:col.E+'px', color:input.time_color}">{{ input.time_value }}</div>
+              <div class="value text-center" data-col="D" :style="{width:col.D+'px'}">{{ input.value_str }}</div>
+              <div class="configure text-center cursor-pointer" data-col="C" :style="{width:col.C+'px'}" id="{{ input.id }}"><i class="icon-wrench" title="Configure Input processing"></i></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
     
     <div id="table" class="input-list"></div>
@@ -282,10 +285,16 @@ var app = new Vue({
   el: '#app',
   data: {
     nodes: [],
-    name_width: "200px",
-    description_width: "200px",
-    time_width: "100px",
-    value_width: "100px"
+    col: {
+      B: 40,  // select
+      A: 200, // name
+      G: 200, // description
+      H: 200, // processList
+      F: 50,  // schedule
+      E: 100, // time
+      D: 100, // value     
+      C: 50,  // config       
+    }
   }
 });
 // ---------------------------------------------------------------------------------------------
@@ -333,14 +342,23 @@ function update(){
                 if (String(value_str).length>max_value_length) max_value_length = String(value_str).length;  
                 
             }
-            app.name_width = ((max_name_length*8)+20);
-            app.description_width = ((max_description_length*8)+20);
-            app.time_width = ((max_time_length*8)+20);
-            app.value_width = ((max_value_length*8)+20);
+            app.col.A = ((max_name_length*8)+20);
+            app.col.G = ((max_description_length*8)+20);
+            app.col.D = ((max_time_length*8)+20);
+            app.col.E = ((max_value_length*8)+20);
+            app.col.H = 200
             
+            resize_view();
+    
             app.nodes = nodes
-              
+            
+            if(firstLoad) {
+                $('#input-loader').hide();
+                firstLoad = false;
+            }
+            
             // Associative array of inputs by id
+            /*
             inputs = {};
             for (var z in data) inputs[data[z].id] = data[z];
             
@@ -378,10 +396,29 @@ function update(){
             }
             // draw_devices();
             // onResize();
-            noProcessNotification(devices);
+            noProcessNotification(devices);*/
         }});
     }});
 }
+
+function resize_view() {
+    // Hide columns 
+    var rowWidth = $("#app").width();
+    hidden = {}
+    keys = Object.keys(app.col).sort();
+
+    var columnsWidth = 0
+    for (k in keys) {
+        let key = keys[k]
+        columnsWidth += app.col[key];
+        hidden[key] = columnsWidth > rowWidth;
+    }
+
+    for (var key in hidden) {
+        if (hidden[key]) app.col[key] = 0
+    }
+}
+
 /** show a message to the user if no processes have been added */
 function noProcessNotification(devices){
     let processList = [],  message = '';
@@ -897,7 +934,11 @@ $(".auth-check-allow").click(function(){
 // watchResize(onResize,50) // only call onResize() after delay (similar to debounce)
 
 // debouncing causes odd rendering during resize - run this at all resize points...
-$(window).on("resize",onResize);
+var resize_timeout = 0;
+$(window).on("resize",function() {
+    clearTimeout(resize_timeout)
+    resize_timeout = setTimeout(resize_view,40);
+});
 
 
 
