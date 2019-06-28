@@ -46,7 +46,7 @@ install:
     ## Setup in apache 
     - sudo apt-add-repository ppa:ondrej/php -y
     - sudo apt-get update
-    - sudo apt-get install php-pear php-dev redis-server build-essential g++ wget -y 
+    - sudo apt-get install php-pear redis-server build-essential g++ wget -y 
     - sudo pear channel-discover pear.swiftmailer.org
     - sudo pecl install swift/swift 
     # - sudo pecl install redis - redis already installed
