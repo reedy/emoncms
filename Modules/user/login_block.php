@@ -37,26 +37,26 @@ global $path, $settings;
         <div id="login-form">
             <div id="loginblock">
                 <div class="form-group register-item" style="display:none">
-                    <label><?php echo __('Email'); ?>
+                    <label><?php _e(('Email'); ?>
                         <input type="text" name="email" tabindex="1"/>
                     </label>
                 </div>
 
                 <div class="form-group">
-                    <label><?php echo __('Username'); ?>
+                    <label><?php _e(('Username'); ?>
                         <input type="text" tabindex="2" autocomplete="on" name="username"  />
                     </label>
                 </div>
 
                 <div class="form-group">
                     <a id="passwordreset-link" class="pull-right" href="#">Forgot password?</a>
-                    <label><?php echo __('Password'); ?>
+                    <label><?php _e(('Password'); ?>
                         <input type="password" tabindex="3" autocomplete="on" name="password" />
                     </label>
                 </div>
 
                 <div class="form-group register-item" style="display:none">
-                    <label><?php echo __('Confirm password'); ?>
+                    <label><?php _e(('Confirm password'); ?>
                         <input id="confirm-password" type="password" name="confirm-password" tabindex="4"/>
                     </label>
                 </div>
@@ -67,20 +67,20 @@ global $path, $settings;
                     <?php if ($settings["interface"]["enable_rememberme"]) { ?>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" tabindex="5" id="rememberme" value="1" name="rememberme"><?php echo '&nbsp;'.__('Remember me'); ?>
+                                <input type="checkbox" tabindex="5" id="rememberme" value="1" name="rememberme">&nbsp;<?php _e('Remember me'); ?>
                             </label>
                         </div>
                     <?php } ?>
-                    <button id="login" class="btn btn-primary" tabindex="6" type="submit"><?php echo __('Login'); ?></button>
+                    <button id="login" class="btn btn-primary" tabindex="6" type="submit"><?php _e(('Login'); ?></button>
                     <?php if ($allowusersregister) { echo '&nbsp;'.__('or').'&nbsp;' ?>
-                        <a id="register-link" href="#"><?php echo __('register'); ?></a>
+                        <a id="register-link" href="#"><?php _e(('register'); ?></a>
                     <?php } ?>
                 </div>
 
                 <div class="form-group register-item" style="display:none">
-                    <button id="register" class="btn btn-primary" type="button"><?php echo __('Register'); ?></button>
+                    <button id="register" class="btn btn-primary" type="button"><?php _e(('Register'); ?></button>
                     <?php echo '&nbsp;'.__('or').'&nbsp;' ?>
-                    <a id="cancel-link" href="#"><?php echo __('login'); ?></a>
+                    <a id="cancel-link" href="#"><?php _e(('login'); ?></a>
                 </div>
 
             </div>
@@ -98,7 +98,7 @@ global $path, $settings;
                 </div>
                 <button id="passwordreset-submit" class="btn btn-primary" type="button">Recover</button>
                 <?php echo '&nbsp;'.__('or').'&nbsp;' ?>
-                <a id="passwordreset-link-cancel" href="#"><?php echo __('login'); ?></a>
+                <a id="passwordreset-link-cancel" href="#"><?php _e(('login'); ?></a>
             </div>
             <div id="passwordresetmessage"></div>
             <p class="pt-1 mb-0"><small id="message" class="muted"><?php echo $message ?></small></p>
