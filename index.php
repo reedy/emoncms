@@ -21,6 +21,8 @@ require "core.php";
 require "route.php";
 require "param.php";
 
+use Gettext\Translator;
+
 $emoncms_version = ($settings['feed']['redisbuffer']['enabled'] ? "low-write " : "") . version();
 
 $path = get_application_path();
@@ -151,7 +153,7 @@ if (!isset($session['lang'])) {
     $session['lang']='';
 }
 set_emoncms_lang($session['lang']);
-use Gettext\Translator;
+
 $t = new Translator(); //Create the translator instance
 $t->register(); //register helper functions
 
