@@ -177,7 +177,7 @@ function user_controller()
                     }
                     if(!empty($preferences)){
                         if(isset($preferences['success']) && $preferences['success']===false){
-                            $error_msg = !empty($preferences['message']) ? $preferences['message'] : _('Error getting data');
+                            $error_msg = !empty($preferences['message']) ? $preferences['message'] : __('Error getting data');
                             // return message if get_preferences() returns error message
                             $result = array('success'=>false, 'message'=>$error_msg);
                         }else{

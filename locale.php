@@ -12,6 +12,9 @@
 // no direct access
 defined('EMONCMS_EXEC') or die('Restricted access');
 
+use Gettext\BaseTranslator;
+use Gettext\Translations;
+
 // Return all locale directory from all modules.
 // If one module has a language it will be detected
 function directoryLocaleScan($dir)
@@ -39,6 +42,7 @@ function get_available_languages()
 }
 
 
+/* Extract the list of browser accept languages  */
 function lang_http_accept()
 {
     $langs = array();
@@ -107,9 +111,10 @@ function set_lang($language)
 function set_lang_by_user($lang)
 {
     $locale = $lang.'.UTF8';
-    define(LC_MESSAGES, $locale);
+    define('LC_MESSAGES', $locale);
     putenv("LC_ALL=$locale");
     setlocale(LC_ALL, $locale);
+    $session['lang'] = $lang; //set language in session
 }
 
 function set_emoncms_lang($lang)
@@ -122,4 +127,48 @@ function set_emoncms_lang($lang)
         set_lang_by_user($lang);
     }
     global $session;
+}
+
+/**
+ * Echo the translation of a string.
+ *
+ * @param string $original
+ *
+ * @return void
+ */
+function _e($original)
+{
+    $text = BaseTranslator::$current->gettext($original);
+
+    if (func_num_args() === 1) {
+        echo $text;
+        return;
+    }
+    $args = array_slice(func_get_args(), 1);
+    $str = is_array($args[0]) ? strtr($text, $args[0]) : vsprintf($text, $args);
+    echo $str;
+
+}
+
+/* Load translation from MO file or if set from redis cache */
+function load_translation_file($mofile, $domain)
+{
+    global $t, $session, $redis;
+    $lang_key='languages:'; //prefix key
+    $lang_code = $session['lang']; //current language selected
+    $ttl = 60 * 60 * 24; //in sec 1gg
+
+    if(file_exists($mofile)) {
+        if($redis->exists($lang_key.$lang_code.':'.$domain)){
+            $cache_translations = $redis->get($lang_key.$lang_code.':'.$domain);
+            $translations = unserialize($cache_translations);
+        }
+        else {
+            $translations = Translations::fromMoFile($mofile);
+            $translations->setDomain($domain);
+            $redis->set($lang_key.$lang_code.':'.$domain, serialize($translations), $ttl);
+        }
+        $t->loadTranslations($translations);
+    }
+
 }
